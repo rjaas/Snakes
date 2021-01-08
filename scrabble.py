@@ -21,7 +21,7 @@ class ScrabbleGame(arcade.Window):
 
     # Call to restart game
     def setup(self):
-        self.background = arcade.load_texture("images/table.png")
+        self.background = arcade.load_texture(os.path.join("images", "table.png"))
 
     # Called to calculate new frame
     def on_update(self, delta_time):
