@@ -1,0 +1,13 @@
+arcade==2.5.2
+attrs==20.3.0
+cffi==1.14.4
+dataclasses==0.8
+numpy==1.19.2
+Pillow==8.1.0
+pkg-resources==0.0.0
+pycparser==2.20
+pyglet==1.5.14
+pymunk==5.7.0
+pytiled-parser==0.9.4a3
+PyYAML==5.3.1
+Shapely==1.7.1
