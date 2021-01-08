@@ -23,7 +23,8 @@ class ScrabbleGame(arcade.Window):
 
         start_x = 150
         start_y = 270
-        arcade.draw_text("Hello world!", start_x, start_y, arcade.color.BLACK, 60)
+        arcade.draw_text("Hello world!", start_x, start_y, arcade.color.BLACK, 60,
+                         rotation=-self.text_angle)
 
 
 def main():
