@@ -1,5 +1,6 @@
 import arcade
-LETTERS_DICTIONARY = {'A':1,'B':3,'C':3}
+LETTERS_DICTIONARY = {'A': 1, 'B': 3, 'C': 3}
+
 
 class Letter(arcade.Sprite):
     """
@@ -9,6 +10,6 @@ class Letter(arcade.Sprite):
 
     def __init__(self, alphabet):
         filename = "images/"+alphabet+".png"
-        super().__init__(filename)
         self.points = LETTERS_DICTIONARY[alphabet]
         self.letter_string = alphabet
+        super().__init__(filename)
