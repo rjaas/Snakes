@@ -1,5 +1,6 @@
 import arcade
 import os
+
 from letters import *
 
 SCREEN_WIDTH = 1280
@@ -12,7 +13,7 @@ LETTERS_DICTIONARY = {'A':1,'B':3,'C':3}
 
 class ScrabbleGame(arcade.Window):
     """
-    Attribute tile: A list that stores all the letters a player starts their game round with
+    Attribute tile: A SpriteList that stores all the letters a player starts their game round with
     """
 
     def __init__(self, width, height, title):
@@ -25,7 +26,10 @@ class ScrabbleGame(arcade.Window):
 
         self.background = None
 
-        self.tile = []
+        self.tile = arcade.SpriteList()
+
+        self.heldLetter = None
+        self.heldLetter_InitialPos = None
 
     # Call to restart game
     def setup(self):
@@ -37,6 +41,10 @@ class ScrabbleGame(arcade.Window):
             new_letter.center_y = new_letter.center_y + vertical_offset
             vertical_offset = vertical_offset + 150
             self.tile.append(new_letter)
+        self.heldLetter = None
+        self.heldLetter_InitialPos = ()
+        self.heldLetterlist = []
+
 
 
     # Called to calculate new frame
@@ -52,6 +60,23 @@ class ScrabbleGame(arcade.Window):
                                             self.background)
         for letters in self.tile:
             letters.draw()
+
+    def on_mouse_press(self, x, y, button, key_modifiers):
+        """ Called when the user presses a mouse button. """
+        self.heldLetterlist = arcade.get_sprites_at_point((x, y), self.tile)
+
+
+    def on_mouse_release(self, x: float, y: float, button: int, modifiers: int):
+        """ Called when the user presses a mouse button. """
+        #if len(self.heldLetter) == 0:
+            #return
+        self.heldLetter = None
+
+    def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
+        """ User moves mouse """
+        if len(self.heldLetterlist) != 0:
+            self.heldLetter.center_x += dx
+            self.heldletter.center_y += dy
 
 
 if __name__ == "__main__":
