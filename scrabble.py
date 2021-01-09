@@ -1,13 +1,13 @@
-import arcade
 import os
-
+import arcade
 from letters import *
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 900
 # SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Basic board"
-#dictionary for storing all letters and their respective points(https://www.thewordfinder.com/scrabble-point-values.php)
+# Dictionary for storing all letters and their respective point values
+# (https://www.thewordfinder.com/scrabble-point-values.php)
 LETTERS_DICTIONARY = {'A': 1, 'B': 3, 'C': 3}
 
 
