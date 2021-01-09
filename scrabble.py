@@ -1,6 +1,6 @@
 import arcade
 import os
-
+from letters import *
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 900
@@ -11,7 +11,7 @@ LETTERS_DICTIONARY = {'A':1,'B':3,'C':3}
 
 
 class ScrabbleGame(arcade.Window):
-    #Hidden attributes:
+    #Hidden attributes
     #Attribute _tile: A list that stores all the letters a player starts their game round with
 
     def __init__(self, width, height, title):
@@ -31,12 +31,12 @@ class ScrabbleGame(arcade.Window):
         self.background = arcade.load_texture(os.path.join("images", "table.png"))
         vertical_offset = 400
         for alphabet in LETTERS_DICTIONARY:
-            new_letter = arcade.Sprite("images/"+alphabet+".png")
+            new_letter = Letter(alphabet)
             new_letter.center_x = 1100
             new_letter.center_y = new_letter.center_y + vertical_offset
             vertical_offset = vertical_offset + 150
             self._tile.append(new_letter)
-            print(self._tile)
+
 
     # Called to calculate new frame
     def on_update(self, delta_time):
