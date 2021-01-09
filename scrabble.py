@@ -64,6 +64,8 @@ class ScrabbleGame(arcade.Window):
     def on_mouse_press(self, x, y, button, key_modifiers):
         """ Called when the user presses a mouse button. """
         self.heldLetterlist = arcade.get_sprites_at_point((x, y), self.tile)
+        for letter_object in self.heldLetterlist:
+            self.heldLetter = letter_object
 
 
     def on_mouse_release(self, x: float, y: float, button: int, modifiers: int):
@@ -75,8 +77,11 @@ class ScrabbleGame(arcade.Window):
     def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
         """ User moves mouse """
         if len(self.heldLetterlist) != 0:
-            self.heldLetter.center_x += dx
-            self.heldletter.center_y += dy
+            if self.heldLetter is not None:
+                self.heldLetter.center_x += dx
+                self.heldletter.center_y += dy
+
+
 
 
 if __name__ == "__main__":
