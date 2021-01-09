@@ -1,5 +1,6 @@
 import arcade
-LETTERS_DICTIONARY = {'A':1,'B':3,'C':3}
+LETTERS_DICTIONARY = {'A': 1, 'B': 3, 'C': 3}
+
 
 class Letter(arcade.Sprite):
     """
