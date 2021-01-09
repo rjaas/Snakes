@@ -8,7 +8,7 @@ SCREEN_HEIGHT = 900
 # SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Basic board"
 #dictionary for storing all letters and their respective points(https://www.thewordfinder.com/scrabble-point-values.php)
-LETTERS_DICTIONARY = {'A':1,'B':3,'C':3}
+LETTERS_DICTIONARY = {'A': 1, 'B': 3, 'C': 3}
 
 
 class ScrabbleGame(arcade.Window):
@@ -43,9 +43,6 @@ class ScrabbleGame(arcade.Window):
             self.tile.append(new_letter)
         self.heldLetter = None
         self.heldLetter_InitialPos = ()
-        self.heldLetterlist = []
-
-
 
     # Called to calculate new frame
     def on_update(self, delta_time):
@@ -63,25 +60,17 @@ class ScrabbleGame(arcade.Window):
 
     def on_mouse_press(self, x, y, button, key_modifiers):
         """ Called when the user presses a mouse button. """
-        self.heldLetterlist = arcade.get_sprites_at_point((x, y), self.tile)
-        for letter_object in self.heldLetterlist:
-            self.heldLetter = letter_object
-
+        self.heldLetter = arcade.get_sprites_at_point((x, y), self.tile)[0]
 
     def on_mouse_release(self, x: float, y: float, button: int, modifiers: int):
         """ Called when the user presses a mouse button. """
-        #if len(self.heldLetter) == 0:
-            #return
         self.heldLetter = None
 
     def on_mouse_motion(self, x: float, y: float, dx: float, dy: float):
         """ User moves mouse """
-        if len(self.heldLetterlist) != 0:
-            if self.heldLetter is not None:
-                self.heldLetter.center_x += dx
-                self.heldletter.center_y += dy
-
-
+        if self.heldLetter is not None:
+            self.heldLetter.center_x += dx
+            self.heldLetter.center_y += dy
 
 
 if __name__ == "__main__":
