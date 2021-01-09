@@ -11,8 +11,9 @@ LETTERS_DICTIONARY = {'A':1,'B':3,'C':3}
 
 
 class ScrabbleGame(arcade.Window):
-    #Hidden attributes
-    #Attribute _tile: A list that stores all the letters a player starts their game round with
+    """
+    Attribute tile: A list that stores all the letters a player starts their game round with
+    """
 
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
@@ -24,7 +25,7 @@ class ScrabbleGame(arcade.Window):
 
         self.background = None
 
-        self._tile = []
+        self.tile = []
 
     # Call to restart game
     def setup(self):
@@ -35,7 +36,7 @@ class ScrabbleGame(arcade.Window):
             new_letter.center_x = 1100
             new_letter.center_y = new_letter.center_y + vertical_offset
             vertical_offset = vertical_offset + 150
-            self._tile.append(new_letter)
+            self.tile.append(new_letter)
 
 
     # Called to calculate new frame
@@ -49,7 +50,7 @@ class ScrabbleGame(arcade.Window):
         arcade.draw_lrwh_rectangle_textured(0, 0,
                                             900, 900,
                                             self.background)
-        for letters in self._tile:
+        for letters in self.tile:
             letters.draw()
 
 
