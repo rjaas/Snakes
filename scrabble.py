@@ -5,6 +5,7 @@ import arcade.gui
 from arcade.gui import UIManager
 from letters import *
 
+
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 900
 BOARD_WIDTH = 900
@@ -24,8 +25,13 @@ class DoneButton(arcade.gui.UIFlatButton):
         print('Done')
 
 class HelpButton(arcade.gui.UIFlatButton):
+    def __init__(self, scrabView, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.scrabView = scrabView
+
     def on_click(self):
-        print('Help')
+        InstrView = HelpView(self.scrabView)
+        window.show_view(InstrView)
 
 class GameViewButton(arcade.gui.UIFlatButton):
     def on_click(self):
@@ -50,6 +56,33 @@ class MainView(arcade.View):
         arcade.start_render()
         button = GameViewButton('Play', center_x=650, center_y=400, width=250)
         ui_manager.add_ui_element(button)
+
+class HelpView(arcade.View):
+    def __init__(self, scrabView):
+        super().__init__()
+        self.scrabView = scrabView
+        
+    def on_draw(self):
+        self.help = arcade.load_texture(os.path.join("images", "help.png"))
+        arcade.start_render()
+        arcade.draw_text("Point Values", 650, 750,
+                         arcade.color.BLACK, font_size=50, anchor_x="center")
+        arcade.draw_text("Press esc to return to game", 650, 650,
+                         arcade.color.BLACK, font_size=20, anchor_x="center")
+        arcade.draw_lrwh_rectangle_textured(500, 25,
+                                            291, 601,
+                                            self.help)
+        
+
+    def on_show_view(self):
+        arcade.set_background_color(arcade.color.WHITE)
+        ui_manager.purge_ui_elements()
+
+    def on_key_press(self, key, _modifiers):
+        if key == arcade.key.ESCAPE:
+            arcade.set_background_color(arcade.color.GREEN)
+            self.window.show_view(self.scrabView)
+            
 
 class ScrabbleGame(arcade.View):
     """
@@ -82,7 +115,6 @@ class ScrabbleGame(arcade.View):
 
     # Call to restart game
     def setup(self):
-        ui_manager.purge_ui_elements()
         self.background = arcade.load_texture(os.path.join("images", "table.png"))
         vertical_offset = 400
         for alphabet in LETTERS_DICTIONARY:
@@ -92,8 +124,11 @@ class ScrabbleGame(arcade.View):
             vertical_offset = vertical_offset + 150
             self.active_blocks.append(new_letter)
         self.heldLetter = None
+
+    def on_show_view(self):
+        ui_manager.purge_ui_elements()
         button = DoneButton('Done', center_x=1100, center_y=150, width=250)
-        button2 = HelpButton('i', center_x=1250, center_y=875, width=50)
+        button2 = HelpButton(self, 'i', center_x=1250, center_y=875, width=50)
         ui_manager.add_ui_element(button)
         ui_manager.add_ui_element(button2)
 
