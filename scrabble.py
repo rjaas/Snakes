@@ -14,7 +14,8 @@ SLOT_HEIGHT = 60
 SCREEN_TITLE = "Snakes and Scrabbles"
 # Dictionary for storing all letters and their respective point values
 # (https://www.thewordfinder.com/scrabble-point-values.php)
-LETTERS_DICTIONARY = {'A': 1, 'B': 3, 'C': 3}
+LETTERS_DICTIONARY = {'A': 1, 'B': 3, 'C': 3, 'D': 2, 'E': 1, 'F': 4, 'G': 2}
+LETTERS_DECK = {'A': 1, 'B': 3, 'C': 3,}
 
 
 class ScrabbleGame(arcade.Window):
@@ -46,19 +47,19 @@ class ScrabbleGame(arcade.Window):
         # Transposed board matrix with rows as tuples: [*zip(*self.board)]
         # Transposed board matrix with rows as lists: list(map(list, [*zip(*self.board)]))
         self.board = [[None for j in range(15)] for i in range(15)]
-        #Wordchecker object attribute for word checking functionality 
+        #Wordchecker object attribute for word checking functionality
         self.Wordchecker = WordChecker()
         self.score = 0
 
     # Call to restart game
     def setup(self):
         self.background = arcade.load_texture(os.path.join("images", "table.png"))
-        vertical_offset = 400
+        vertical_offset = 200
         for alphabet in LETTERS_DICTIONARY:
             new_letter = Letter(alphabet)
             new_letter.center_x = 1100
             new_letter.center_y = new_letter.center_y + vertical_offset
-            vertical_offset = vertical_offset + 150
+            vertical_offset = vertical_offset + 100
             self.active_blocks.append(new_letter)
         self.heldLetter = None
 
@@ -148,6 +149,9 @@ class ScrabbleGame(arcade.Window):
             self.score = LETTERS_DICTIONARY[letters] + self.score
         return self.score
 
+    #def
+
+    #def word_dealer(self):
 
 
 
