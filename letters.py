@@ -45,6 +45,7 @@ class Letter(arcade.Sprite):
         # Starting coordinates (values set in first update)
         self.home_x = None
         self.home_y = None
+        self.home_slot_index = None
         # Coordinates of movement start
         self.return_x = None
         self.return_y = None

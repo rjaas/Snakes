@@ -1,12 +1,12 @@
 import os
 import copy
 import math
+import random
 import arcade
 import arcade.gui
 from arcade.gui import UIManager
 from letters import *
 from wordchecker import *
-import random
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 900
@@ -20,15 +20,43 @@ SLOT_COUNT_Y = 15
 SCREEN_TITLE = "Snakes and Scrabbles"
 # Dictionary for storing all letters and their respective point values
 # (https://www.thewordfinder.com/scrabble-point-values.php)
-LETTER_DECK = ["a" for i in range(2)] + \
-              ["c"] +\
-              ["e"] +\
-              ["k"] +\
-              ["n"] + \
-              ["s"]
+LETTER_DECK = ["a" for i in range(9)] + \
+              ["b" for i in range(2)] + \
+              ["c" for i in range(2)] + \
+              ["d" for i in range(4)] + \
+              ["e" for i in range(12)] + \
+              ["f" for i in range(2)] + \
+              ["g" for i in range(3)] + \
+              ["h" for i in range(2)] + \
+              ["i" for i in range(9)] + \
+              ["j" for i in range(1)] + \
+              ["k" for i in range(1)] + \
+              ["l" for i in range(4)] + \
+              ["m" for i in range(2)] + \
+              ["n" for i in range(6)] + \
+              ["o" for i in range(8)] + \
+              ["p" for i in range(2)] + \
+              ["q" for i in range(1)] + \
+              ["r" for i in range(6)] + \
+              ["s" for i in range(4)] + \
+              ["t" for i in range(6)] + \
+              ["u" for i in range(4)] + \
+              ["v" for i in range(2)] + \
+              ["w" for i in range(2)] + \
+              ["x" for i in range(1)] + \
+              ["y" for i in range(2)] + \
+              ["z" for i in range(1)]
+
+STARTING_HAND = ["a" for i in range(2)] + \
+                ["c"] +\
+                ["e"] +\
+                ["k"] +\
+                ["n"] + \
+                ["s"]
+PLAYER_SLOTS = [[1100, 300 + SLOT_HEIGHT * i] for i in range(7)]
 
 
-class DoneButton(arcade.gui.UIFlatButton):
+class SubmitButton(arcade.gui.UIFlatButton):
     def on_click(self):
         print('Done')
 
@@ -101,15 +129,12 @@ class ScrabbleGame(arcade.View):
     def setup(self):
         ui_manager.purge_ui_elements()
         self.background = arcade.load_texture(os.path.join("images", "table.png"))
-        vertical_offset = 300
-        for letter in LETTER_DECK:
-            new_letter = Letter(letter)
-            new_letter.center_x = 1100
-            new_letter.center_y = new_letter.center_y + vertical_offset
-            vertical_offset = vertical_offset + SLOT_HEIGHT
-            self.active_blocks.append(new_letter)
+        for i in range(len(PLAYER_SLOTS)):
+            self.create_letter(STARTING_HAND[i],
+                               PLAYER_SLOTS[i][0], PLAYER_SLOTS[i][1],
+                               i)
         self.heldLetter = None
-        button = DoneButton('Done', center_x=1100, center_y=150, width=250)
+        button = SubmitButton('Submit move', center_x=1100, center_y=150, width=250)
         button2 = HelpButton('i', center_x=1250, center_y=875, width=50)
         ui_manager.add_ui_element(button)
         ui_manager.add_ui_element(button2)
@@ -214,10 +239,29 @@ class ScrabbleGame(arcade.View):
                 self.pending_blocks = arcade.SpriteList()
                 return
         # If all checks passed, place the letter blocks
+        empty_slots = []
         for block in self.pending_blocks:
             self.inactive_blocks.append(block)
+            empty_slots.append(block.home_slot_index)
         self.update_score()
+        self.populate(empty_slots)
         self.pending_blocks = arcade.SpriteList()
+
+    def populate(self, slots):
+        new = self.new_letters(len(slots))
+        for i in range(len(slots)):
+            self.create_letter(new[i],
+                               PLAYER_SLOTS[slots[i]][0], PLAYER_SLOTS[slots[i]][1],
+                               slots[i])
+
+    def create_letter(self, character, x, y, home_slot_index):
+        new_letter = Letter(character)
+        new_letter.center_x = x
+        new_letter.center_y = y
+        new_letter.home_slot_index = home_slot_index
+        self.active_blocks.append(new_letter)
+
+        return new_letter
 
     def update_score(self):
         for i in range(SLOT_COUNT_X):
@@ -231,22 +275,14 @@ class ScrabbleGame(arcade.View):
     def letter_score(self, letter_to_score):
         return LETTERS_DICTIONARY[letter_to_score.letter_string]
 
-    def new_deck(self, tiles):
-        #tiles is the number of new letters to generate(initially 7)
-        index = []
-        letters_deck = []
-        for tile in range(tiles):
-            random_num = random.randint(0,8) #generate a list of random numbers
-            while random_num in index:
-                random_num = random.randint(0,8)
-            index.append(random_num)
-        for number in index:
-            new = list(LETTERS_DICTIONARY.items())[number]
-            letters_deck.append(new)
-        dict_deck_letters = dict(letters_deck)
-        return dict_deck_letters
-
-
+    def new_letters(self, tiles):
+        # tiles is the number of new letters to generate(initially 7)
+        letters = []
+        for i in range(tiles):
+            choice = random.choice(LETTER_DECK)
+            letters.append(choice)
+            LETTER_DECK.remove(choice)
+        return letters
 
 
 if __name__ == "__main__":
