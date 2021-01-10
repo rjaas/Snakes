@@ -142,7 +142,8 @@ class ScrabbleGame(arcade.View):
     # Checks board when the RETURN (ENTER) key is pressed
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.RETURN:
-            self.check_board()
+            if len(self.pending_blocks) > 0:
+                self.check_board()
 
     def on_mouse_press(self, x, y, button, key_modifiers):
         """ Called when the user presses a mouse button. """
@@ -219,6 +220,9 @@ class ScrabbleGame(arcade.View):
             for j in range(SLOT_COUNT_Y):
                 if self.board_temp[i][j] != self.board[i][j]:
                     self.score += self.letter_score(self.board_temp[i][j])
+        self.board = []
+        for i in range(SLOT_COUNT_X):
+            self.board.append(copy.copy(self.board_temp[i]))
 
     def letter_score(self, letter):
         return LETTERS_DICTIONARY[letter.letter_string]
