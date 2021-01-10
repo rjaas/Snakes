@@ -1,4 +1,5 @@
 import os
+import copy
 import math
 import arcade
 import arcade.gui
@@ -12,17 +13,15 @@ BOARD_WIDTH = 900
 BOARD_HEIGHT = 900
 SLOT_WIDTH = 60
 SLOT_HEIGHT = 60
+SLOT_COUNT_X = 15
+SLOT_COUNT_Y = 15
 # SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Snakes and Scrabbles"
 # Dictionary for storing all letters and their respective point values
 # (https://www.thewordfinder.com/scrabble-point-values.php)
-LETTERS_DICTIONARY = {'A': 1, 'B': 3, 'C': 3}
-
-
-class ScrabbleGame(arcade.Window):
-    """
-    Attribute tile: A SpriteList that stores all the letters a player starts their game round with
-    """
+LETTER_DECK = ["a" for i in range(2)] + \
+              ["b"] + \
+              ["c"]
 
 
 class DoneButton(arcade.gui.UIFlatButton):
@@ -37,9 +36,9 @@ class HelpButton(arcade.gui.UIFlatButton):
 
 class GameViewButton(arcade.gui.UIFlatButton):
     def on_click(self):
-        GameView = ScrabbleGame()
-        GameView.setup()
-        window.show_view(GameView)
+        game_view = ScrabbleGame()
+        game_view.setup()
+        window.show_view(game_view)
 
 
 class MainView(arcade.View):
@@ -87,9 +86,11 @@ class ScrabbleGame(arcade.View):
 
         # Transposed board matrix with rows as tuples: [*zip(*self.board)]
         # Transposed board matrix with rows as lists: list(map(list, [*zip(*self.board)]))
-        self.board = [[None for j in range(15)] for i in range(15)]
+        self.board = [[None for j in range(SLOT_COUNT_X)] for i in range(SLOT_COUNT_Y)]
+        self.board_temp = copy.deepcopy(self.board)
+
         # Wordchecker object attribute for word checking functionality
-        self.Wordchecker = WordChecker()
+        self.word_checker = WordChecker()
         self.score = 0
 
     # Call to restart game
@@ -97,8 +98,8 @@ class ScrabbleGame(arcade.View):
         ui_manager.purge_ui_elements()
         self.background = arcade.load_texture(os.path.join("images", "table.png"))
         vertical_offset = 400
-        for alphabet in LETTERS_DICTIONARY:
-            new_letter = Letter(alphabet)
+        for letter in LETTER_DECK:
+            new_letter = Letter(letter)
             new_letter.center_x = 1100
             new_letter.center_y = new_letter.center_y + vertical_offset
             vertical_offset = vertical_offset + 150
@@ -134,7 +135,7 @@ class ScrabbleGame(arcade.View):
         self.pending_blocks.draw()
         self.moving_blocks.draw()
         score_text = "Score: " + str(self.score)
-        arcade.draw_text(score_text, 950, 880,
+        arcade.draw_text(score_text, 1100, 100,
                          arcade.color.BLACK, 20, width=500, align="center",
                          anchor_x="center", anchor_y="center")
 
@@ -153,7 +154,9 @@ class ScrabbleGame(arcade.View):
             self.active_blocks.remove(self.heldLetter)
             self.moving_blocks.append(self.heldLetter)
             if len(arcade.get_sprites_at_point((x, y), self.inactive_blocks)) == 0 and x < BOARD_WIDTH:
-                self.heldLetter.place(self.nearest_cell(x, y))
+                letter_x, letter_y = self.nearest_cell(x, y)
+                self.heldLetter.place(letter_x, letter_y)
+                self.board_temp[int((letter_x-SLOT_WIDTH/2)/SLOT_WIDTH)][int((letter_y - SLOT_HEIGHT/2)/SLOT_HEIGHT)] = self.heldLetter
             else:
                 self.heldLetter.return_home()
             self.heldLetter = None
@@ -168,25 +171,57 @@ class ScrabbleGame(arcade.View):
         return [SLOT_WIDTH * math.floor(x/SLOT_WIDTH) + SLOT_WIDTH / 2,
                 SLOT_HEIGHT * math.floor(y/SLOT_HEIGHT) + SLOT_HEIGHT / 2]
 
-    def check_board(self):
-        word_to_check = ''
-        # Check if placement is valid
-        for block in self.pending_blocks:
-            word_to_check = word_to_check + block.letter_string
-        if self.Wordchecker.check(word_to_check.lower()) == True and len(word_to_check) > 1:
-            self.inactive_blocks.append(block)
-            new_score = self.word_score(word_to_check)
-        # If not, revert last move
-        else:
-            for block in self.pending_blocks:
-                block.return_home()
-                self.moving_blocks.append(block)
-            self.pending_blocks = arcade.SpriteList()
+    def get_strings(self):
+        strings = []
+        for row in self.board_temp:
+            string_builder = ""
+            for letter in row:
+                if letter is not None:
+                    string_builder += letter.letter_string
+                elif len(string_builder) > 0:
+                    # Only remember strings longer than one letter
+                    if len(string_builder) > 1:
+                        strings.append(string_builder)
+                    string_builder = ""
 
-    def word_score(self, word):
-        for letters in word:
-            self.score = LETTERS_DICTIONARY[letters] + self.score
-        return self.score
+        for col in [*zip(*self.board_temp)]:
+            string_builder = ""
+            for letter in col:
+                if letter is not None:
+                    string_builder += letter.letter_string
+                elif len(string_builder) > 0:
+                    if len(string_builder) > 1:
+                        strings.append(string_builder)
+                    string_builder = ""
+
+        return strings
+
+    def check_board(self):
+        # Check if placement is valid
+        strings = self.get_strings()
+        for s in strings:
+            # If not, revert last move
+            if not (self.word_checker.check(s) or self.word_checker.check(s[::-1])):
+                for block in self.pending_blocks:
+                    block.return_home()
+                    self.moving_blocks.append(block)
+                self.board_temp = copy.deepcopy(self.board)
+                self.pending_blocks = arcade.SpriteList()
+                return
+        # If all checks passed, place the letter blocks
+        for block in self.pending_blocks:
+            self.inactive_blocks.append(block)
+        self.update_score()
+        self.pending_blocks = arcade.SpriteList()
+
+    def update_score(self):
+        for i in range(SLOT_COUNT_X):
+            for j in range(SLOT_COUNT_Y):
+                if self.board_temp[i][j] != self.board[i][j]:
+                    self.score += self.letter_score(self.board_temp[i][j])
+
+    def letter_score(self, letter):
+        return LETTERS_DICTIONARY[letter.letter_string]
 
 
 if __name__ == "__main__":

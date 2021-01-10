@@ -1,18 +1,19 @@
 import os
 import arcade
-LETTERS_DICTIONARY = {'A': 1, 'B': 3, 'C': 3}
+
+LETTERS_DICTIONARY = {'a': 1, 'b': 3, 'c': 3}
 
 
 class Letter(arcade.Sprite):
     """
-    Attribute letter_string: A string that denotes which alphabet each Letter object represents
+    Attribute letter_string: A string that denotes which letter_string each Letter object represents
     Attribute points: Number of points associated with each letter, according to Scrabble rules
     """
 
-    def __init__(self, alphabet):
-        filename = os.path.join("images/", alphabet+".png")
-        self.points = LETTERS_DICTIONARY[alphabet]
-        self.letter_string = alphabet
+    def __init__(self, letter_string):
+        filename = os.path.join("images/", letter_string.upper() + ".png")
+        self.points = LETTERS_DICTIONARY[letter_string]
+        self.letter_string = letter_string
         # Variable to track whether block is moving
         self.movement = False
         # Variable to track whether block has been placed on the board
@@ -59,13 +60,13 @@ class Letter(arcade.Sprite):
         if self.center_x == target_x and self.center_y == target_y:
             self.movement = False
 
-    def place(self, coordinates):
+    def place(self, x, y):
         self.movement = True
         self.placed = True
         self.return_x = self.center_x
         self.return_y = self.center_y
-        self.placement_x = coordinates[0]
-        self.placement_y = coordinates[1]
+        self.placement_x = x
+        self.placement_y = y
 
     def return_home(self):
         self.movement = True
