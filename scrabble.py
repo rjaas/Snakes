@@ -5,6 +5,7 @@ import arcade.gui
 from arcade.gui import UIManager
 from letters import *
 from wordchecker import *
+import random
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 900
@@ -16,7 +17,9 @@ SLOT_HEIGHT = 60
 SCREEN_TITLE = "Snakes and Scrabbles"
 # Dictionary for storing all letters and their respective point values
 # (https://www.thewordfinder.com/scrabble-point-values.php)
-LETTERS_DICTIONARY = {'A': 1, 'B': 3, 'C': 3}
+LETTERS_DICTIONARY = {'A': 1, 'B': 3, 'C': 3, 'D': 2, 'E': 1, 'F': 4, 'G':2,
+'H':4, 'I':1, 'J':8, 'K':5, 'L':1, 'M':3, 'N':1, 'O':1, 'P':3, 'Q':10, 'R':1,
+'S':1, 'T':1, 'U':1, 'V':4, 'W':4, 'X':8, 'Y':4, 'Z':10}
 
 
 class ScrabbleGame(arcade.Window):
@@ -45,15 +48,15 @@ class GameViewButton(arcade.gui.UIFlatButton):
 class MainView(arcade.View):
     def __init__(self):
         super().__init__()
-    
+
     def on_draw(self):
         arcade.start_render()
         arcade.draw_text("Scrabble", 500, 500, arcade.color.BLACK, font_size=80)
-    
+
     def on_show_view(self):
         self.setup()
         arcade.set_background_color(arcade.color.WHITE)
-    
+
     def setup(self):
         arcade.start_render()
         button = GameViewButton('Play', center_x=650, center_y=400, width=250)
@@ -96,12 +99,13 @@ class ScrabbleGame(arcade.View):
     def setup(self):
         ui_manager.purge_ui_elements()
         self.background = arcade.load_texture(os.path.join("images", "table.png"))
-        vertical_offset = 400
-        for alphabet in LETTERS_DICTIONARY:
+        vertical_offset = 210
+        letters_in_deck = self.new_deck(7)
+        for alphabet in letters_in_deck:
             new_letter = Letter(alphabet)
             new_letter.center_x = 1100
             new_letter.center_y = new_letter.center_y + vertical_offset
-            vertical_offset = vertical_offset + 150
+            vertical_offset = vertical_offset + 100
             self.active_blocks.append(new_letter)
         self.heldLetter = None
         button = DoneButton('Done', center_x=1100, center_y=150, width=250)
@@ -187,6 +191,23 @@ class ScrabbleGame(arcade.View):
         for letters in word:
             self.score = LETTERS_DICTIONARY[letters] + self.score
         return self.score
+
+    def new_deck(self, tiles):
+        #tiles is the number of new letters to generate(initially 7)
+        index = []
+        letters_deck = []
+        for tile in range(tiles):
+            random_num = random.randint(0,8) #generate a list of random numbers
+            while random_num in index:
+                random_num = random.randint(0,8)
+            index.append(random_num)
+        for number in index:
+            new_letter = list(LETTERS_DICTIONARY.items())[number]
+            letters_deck.append(new_letter)
+        dict_deck_letters = dict(letters_deck)
+        return dict_deck_letters
+
+
 
 
 if __name__ == "__main__":
