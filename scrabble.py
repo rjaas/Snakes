@@ -46,6 +46,7 @@ class ScrabbleGame(arcade.Window):
         # Transposed board matrix with rows as tuples: [*zip(*self.board)]
         # Transposed board matrix with rows as lists: list(map(list, [*zip(*self.board)]))
         self.board = [[None for j in range(15)] for i in range(15)]
+        #Wordchecker object attribute for word checking functionality 
         self.Wordchecker = WordChecker()
         self.score = 0
 
