@@ -57,13 +57,17 @@ PLAYER_SLOTS = [[1100, 300 + SLOT_HEIGHT * i] for i in range(7)]
 
 
 class SubmitButton(arcade.gui.UIFlatButton):
+    def __init__(self, game, *args, **kwargs):
+        self.game = game
+        super(SubmitButton, self).__init__(*args, **kwargs)
+
     def on_click(self):
-        print('Done')
+        self.game.check_board()
 
 
-class HelpButton(arcade.gui.UIFlatButton):
+class InfoButton(arcade.gui.UIFlatButton):
     def on_click(self):
-        print('Help')
+        print('Made by Shreya, Rauno and Ricky.')
 
 
 class GameViewButton(arcade.gui.UIFlatButton):
@@ -89,6 +93,10 @@ class MainView(arcade.View):
         arcade.start_render()
         button = GameViewButton('Play', center_x=650, center_y=400, width=250)
         ui_manager.add_ui_element(button)
+
+
+def submit_click(self, game):
+    game.check_board()
 
 
 class ScrabbleGame(arcade.View):
@@ -134,10 +142,10 @@ class ScrabbleGame(arcade.View):
                                PLAYER_SLOTS[i][0], PLAYER_SLOTS[i][1],
                                i)
         self.heldLetter = None
-        button = SubmitButton('Submit move', center_x=1100, center_y=150, width=250)
-        button2 = HelpButton('i', center_x=1250, center_y=875, width=50)
-        ui_manager.add_ui_element(button)
-        ui_manager.add_ui_element(button2)
+        submit_button = SubmitButton(self, 'Submit move', center_x=1100, center_y=150, width=250)
+        info_button = InfoButton('i', center_x=1250, center_y=875, width=50)
+        ui_manager.add_ui_element(submit_button)
+        ui_manager.add_ui_element(info_button)
 
     # Called to calculate new frame
     def on_update(self, delta_time):
