@@ -65,9 +65,14 @@ class SubmitButton(arcade.gui.UIFlatButton):
         self.game.check_board()
 
 
-class InfoButton(arcade.gui.UIFlatButton):
+class HelpButton(arcade.gui.UIFlatButton):
+    def __init__(self, scrab_view, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.scrabView = scrab_view
+
     def on_click(self):
-        print('Made by Shreya, Rauno and Ricky.')
+        instruction_view = HelpView(self.scrabView)
+        window.show_view(instruction_view)
 
 
 class GameViewButton(arcade.gui.UIFlatButton):
@@ -90,13 +95,39 @@ class MainView(arcade.View):
         arcade.set_background_color(arcade.color.WHITE)
 
     def setup(self):
+        ui_manager.purge_ui_elements()
         arcade.start_render()
         button = GameViewButton('Play', center_x=650, center_y=400, width=250)
         ui_manager.add_ui_element(button)
 
 
-def submit_click(self, game):
-    game.check_board()
+class HelpView(arcade.View):
+    def __init__(self, scrab_view):
+        super().__init__()
+        self.scrabView = scrab_view
+        self.help = arcade.load_texture(os.path.join("images", "help.png"))
+        
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text("Point Values", 650, 750,
+                         arcade.color.BLACK, font_size=50, anchor_x="center")
+        arcade.draw_text("Made by Shreya, Rauno and Ricky.", 650, 700,
+                         arcade.color.BLACK, font_size=20, anchor_x="center")
+        arcade.draw_text("Press esc to return to game", 650, 650,
+                         arcade.color.BLACK, font_size=20, anchor_x="center")
+        arcade.draw_lrwh_rectangle_textured(500, 25,
+                                            291, 601,
+                                            self.help)
+
+    def on_show_view(self):
+        ui_manager.purge_ui_elements()
+        arcade.set_background_color(arcade.color.WHITE)
+
+    def on_key_press(self, key, _modifiers):
+        if key == arcade.key.ESCAPE:
+            arcade.set_background_color(arcade.color.GREEN)
+            self.scrabView.setup_ui()
+            self.window.show_view(self.scrabView)
 
 
 class ScrabbleGame(arcade.View):
@@ -133,19 +164,22 @@ class ScrabbleGame(arcade.View):
         self.word_checker = WordChecker()
         self.score = 0
 
-    # Call to restart game
-    def setup(self):
+    def setup_ui(self):
         ui_manager.purge_ui_elements()
         self.background = arcade.load_texture(os.path.join("images", "table.png"))
+        submit_button = SubmitButton(self, 'Submit move', center_x=1100, center_y=150, width=250)
+        info_button = HelpButton(self, 'i', center_x=1250, center_y=875, width=50)
+        ui_manager.add_ui_element(submit_button)
+        ui_manager.add_ui_element(info_button)
+
+    # Call to restart game
+    def setup(self):
+        self.setup_ui()
         for i in range(len(PLAYER_SLOTS)):
             self.create_letter(STARTING_HAND[i],
                                PLAYER_SLOTS[i][0], PLAYER_SLOTS[i][1],
                                i)
         self.heldLetter = None
-        submit_button = SubmitButton(self, 'Submit move', center_x=1100, center_y=150, width=250)
-        info_button = InfoButton('i', center_x=1250, center_y=875, width=50)
-        ui_manager.add_ui_element(submit_button)
-        ui_manager.add_ui_element(info_button)
 
     # Called to calculate new frame
     def on_update(self, delta_time):
