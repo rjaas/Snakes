@@ -2,6 +2,7 @@ import os
 import math
 import arcade
 from letters import *
+from wordchecker import *
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 900
@@ -45,6 +46,8 @@ class ScrabbleGame(arcade.Window):
         # Transposed board matrix with rows as tuples: [*zip(*self.board)]
         # Transposed board matrix with rows as lists: list(map(list, [*zip(*self.board)]))
         self.board = [[None for j in range(15)] for i in range(15)]
+        self.Wordchecker = WordChecker()
+        self.score = 0
 
     # Call to restart game
     def setup(self):
@@ -83,6 +86,10 @@ class ScrabbleGame(arcade.Window):
         self.inactive_blocks.draw()
         self.pending_blocks.draw()
         self.moving_blocks.draw()
+        score_text = "Score: " + str(self.score)
+        arcade.draw_text(score_text, 950, 880,
+                         arcade.color.BLACK, 20, width=500, align="center",
+                         anchor_x="center", anchor_y="center")
 
     # Checks board when the RETURN (ENTER) key is pressed
     def on_key_press(self, symbol: int, modifiers: int):
@@ -123,10 +130,24 @@ class ScrabbleGame(arcade.Window):
         #  with the state before the last move, calculate the added score, and update the score and
         #  the scoreboard (once implemented)
         # Placeholder action: moves letters to their starting positions
+        word_to_check = ''
         for block in self.pending_blocks:
-            block.return_home()
-            self.moving_blocks.append(block)
-        self.pending_blocks = arcade.SpriteList()
+            word_to_check = word_to_check + block.letter_string
+        if self.Wordchecker.check(word_to_check.lower()) == True and len(word_to_check) > 1:
+            self.inactive_blocks.append(block)
+            new_score = self.word_score(word_to_check)
+        else:
+            for block in self.pending_blocks:
+                block.return_home()
+                self.moving_blocks.append(block)
+            self.pending_blocks = arcade.SpriteList()
+
+    def word_score(self,word):
+        for letters in word:
+            self.score = LETTERS_DICTIONARY[letters] + self.score
+        return self.score
+
+
 
 
 if __name__ == "__main__":
